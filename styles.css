@@ -515,6 +515,40 @@ body {
 .btn--ghost:hover {
   background: var(--cream-2);
 }
+
+/* "Read to me" speaker button — coral pop so it doesn't compete with the primary */
+.btn--speak {
+  background: var(--accent);
+  color: var(--cream);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+.btn--speak:hover {
+  background: var(--accent-2);
+  color: var(--ink);
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--ink);
+}
+.btn--speak:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 var(--ink);
+}
+.btn__icon-speak {
+  display: inline-flex;
+  align-items: center;
+}
+/* When actively speaking, the icon waves */
+.btn--speak.is-speaking .btn__icon-speak {
+  animation: speakWave 0.8s ease-in-out infinite;
+}
+@keyframes speakWave {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.2); }
+}
+.btn--speak.is-speaking {
+  background: var(--mint-deep);
+  color: var(--cream);
+}
+
 .btn__arrow {
   display: inline-block;
   transition: transform 0.2s;
