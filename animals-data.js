@@ -23,14 +23,14 @@ const ANIMALS = {
     emoji: "🐬",
     tag: "Friendly · Playful · Loves the crew",
     fact: "Dolphins give each other names! They use special whistle sounds to call their friends, and each dolphin has its very own signature whistle.",
-    keywords: ["friend", "swim", "water", "pool", "beach", "ocean", "social", "funny", "joke", "happy", "smile", "laugh", "play", "team"]
+    keywords: ["swim", "pool", "beach", "ocean", "dolphin", "splash", "surf", "lots of friends", "best friend", "team sport", "teammate"]
   },
   elephant: {
     name: "The Elephant",
     emoji: "🐘",
     tag: "Kind · Caring · Never forgets a friend",
     fact: "Elephants can recognize themselves in a mirror, and they really do have amazing memories — they can remember friends and family members for decades.",
-    keywords: ["kind", "help", "family", "remember", "memory", "gentle", "big", "care", "love", "hug", "nice", "sister", "brother", "mom", "dad", "grandma", "grandpa"]
+    keywords: ["family", "remember", "memory", "gentle", "grandma", "grandpa", "caring", "patient with people", "never forget", "elephant"]
   },
   penguin: {
     name: "The Penguin",
