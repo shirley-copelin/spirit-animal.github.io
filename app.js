@@ -319,15 +319,121 @@ function revealAnimal(animal) {
 
 /* ============ Try again ============ */
 document.getElementById("try-again").addEventListener("click", () => {
+  stopSpeakingIfAny();
   describeInput.value = "";
   showScreen("describe");
   setTimeout(() => describeInput.focus(), 400);
 });
 
+/* ============ Read to me (text-to-speech) ============
+   Uses the browser's built-in SpeechSynthesis API. No API key, no cost.
+   We try to pick a warm-sounding female English voice. Browsers ship
+   different voices (Samantha on Apple, Zira on Windows, Google voices
+   on Chrome, etc.) so we score them and pick the best available.
+============================================ */
+const readBtn = document.getElementById("read-to-me");
+
+function pickFriendlyVoice() {
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices.length) return null;
+
+  // Prefer these by name — they're consistently the warmest female voices
+  // across platforms. Higher-indexed = higher preference.
+  const preferredNames = [
+    "Samantha",        // macOS / iOS — great warm tone, works on most Apple devices
+    "Karen",           // macOS — Australian warmth
+    "Google US English", // Chrome female voice
+    "Microsoft Aria",  // Windows — newer natural voice
+    "Microsoft Jenny", // Windows — newer natural voice
+    "Microsoft Zira",  // Windows — older fallback
+    "Moira",           // macOS — Irish-English
+    "Tessa"            // macOS
+  ];
+
+  const scoreVoice = (v) => {
+    let score = 0;
+    // Must be English-ish
+    if (!/^en/i.test(v.lang || "")) return -1;
+    // Prefer en-US and en-GB slightly
+    if (/^en-US/i.test(v.lang)) score += 3;
+    if (/^en-GB/i.test(v.lang)) score += 2;
+    // Name-based preference (the big signal)
+    preferredNames.forEach((name, i) => {
+      if ((v.name || "").includes(name)) score += 20 + i;
+    });
+    // "Female" in the name is a strong hint
+    if (/female/i.test(v.name)) score += 10;
+    // Avoid known male voices
+    if (/(Daniel|Alex|Fred|Thomas|Rishi|male)/i.test(v.name)) score -= 15;
+    return score;
+  };
+
+  const best = voices
+    .map(v => ({ v, s: scoreVoice(v) }))
+    .filter(x => x.s >= 0)
+    .sort((a, b) => b.s - a.s)[0];
+
+  return best ? best.v : voices.find(v => /^en/i.test(v.lang)) || voices[0];
+}
+
+// Voices load asynchronously in some browsers — prime the list
+if ("speechSynthesis" in window) {
+  window.speechSynthesis.getVoices();
+  window.speechSynthesis.addEventListener?.("voiceschanged", () => {
+    // no-op; just triggers voice list to populate
+  });
+}
+
+function speakAnimal() {
+  if (!("speechSynthesis" in window)) {
+    alert("Sorry! Your browser doesn't support reading text out loud. Try Chrome or Safari.");
+    return;
+  }
+
+  const synth = window.speechSynthesis;
+
+  // If already speaking, clicking again stops it
+  if (synth.speaking) {
+    synth.cancel();
+    readBtn.classList.remove("is-speaking");
+    return;
+  }
+
+  const animalName = document.getElementById("animal-name").textContent;
+  const animalFact = document.getElementById("animal-fact").textContent;
+  const text = `${kidName ? kidName + ", " : ""}your spirit animal is ${animalName}. ${animalFact}`;
+
+  const utter = new SpeechSynthesisUtterance(text);
+  const voice = pickFriendlyVoice();
+  if (voice) utter.voice = voice;
+  utter.rate = 0.95;   // slightly slower for 1st graders
+  utter.pitch = 1.1;   // a touch brighter / warmer
+  utter.volume = 1.0;
+
+  utter.onstart = () => readBtn.classList.add("is-speaking");
+  utter.onend   = () => readBtn.classList.remove("is-speaking");
+  utter.onerror = () => readBtn.classList.remove("is-speaking");
+
+  synth.speak(utter);
+}
+
+if (readBtn) {
+  readBtn.addEventListener("click", speakAnimal);
+}
+
+// If the kid leaves the reveal screen while it's talking, stop the voice
+function stopSpeakingIfAny() {
+  if ("speechSynthesis" in window && window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
+    readBtn?.classList.remove("is-speaking");
+  }
+}
+
 /* ============ Restart (back to the very beginning) ============ */
 const restartBtn = document.getElementById("restart");
 if (restartBtn) {
   restartBtn.addEventListener("click", () => {
+    stopSpeakingIfAny();
     // Clear everything so the next kid starts fresh
     if (nameInput) nameInput.value = "";
     if (describeInput) describeInput.value = "";
