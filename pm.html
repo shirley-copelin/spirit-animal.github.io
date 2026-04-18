@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Made by a PM · SpiritZoo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="bg-grain" aria-hidden="true"></div>
+  <div class="bg-blob bg-blob--1" aria-hidden="true"></div>
+  <div class="bg-blob bg-blob--2" aria-hidden="true"></div>
+
+  <header class="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__logo" style="text-decoration:none; color:inherit;">
+        <span class="nav__logo-mark">✦</span>
+        <span class="nav__logo-text">Spirit<span class="nav__logo-accent">Zoo</span></span>
+      </a>
+      <nav class="nav__links" aria-label="Primary">
+        <a href="animals.html" class="nav__link">Animals</a>
+        <a href="about.html" class="nav__link">About Gus</a>
+        <a href="pm.html" class="nav__link nav__link--badge" aria-current="page">Made by a PM ✌️</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="subpage">
+    <a href="index.html" class="back-link">← Back to Gus</a>
+
+    <section class="pm-hero">
+
+      <!-- PHOTO FRAME — swap the placeholder for Ada's family photo -->
+      <div class="pm-photo-frame">
+        <!--
+          👇 TO ADD YOUR PHOTO:
+          1. Drop your photo file in this folder (e.g., "family.jpg")
+          2. Delete the <div class="pm-photo-frame__placeholder">...</div> below
+          3. Uncomment this line and replace the filename:
+               <img class="pm-photo-frame__img" src="family.jpg" alt="Ada and her family" />
+        -->
+        <div class="pm-photo-frame__placeholder">
+          <div class="pm-photo-frame__placeholder-icon">👨‍👩‍👧</div>
+          <p class="pm-photo-frame__placeholder-title">A family photo goes here!</p>
+          <p class="pm-photo-frame__placeholder-note">
+            Save a photo in this folder and update <code class="pm-photo-frame__placeholder-code">pm.html</code>
+            (there are step-by-step instructions inside the file).
+          </p>
+        </div>
+      </div>
+
+      <div class="pm-intro">
+        <p class="pm-intro__eyebrow">Made by Ada's grown-up</p>
+        <h1 class="pm-intro__headline">Hi! I'm a <em>Product Manager</em>.</h1>
+        <p class="pm-intro__body">
+          My job is to help teams figure out <strong>what to build</strong> and <strong>who to build it for</strong>.
+          I work with designers (who make things pretty) and engineers (who make things work).
+        </p>
+        <p class="pm-intro__body">
+          This little app is a tiny example of my job: I imagined a fun experience for Ada's class,
+          I designed how it should look, and I built how it works.
+          Now I get to share it with you!
+        </p>
+        <p class="pm-intro__body">
+          Most of all, <strong>I get to come home to this crew</strong> — my favorite product team of all. 💚
+        </p>
+      </div>
+
+    </section>
+
+    <div class="pm-quote">
+      <p class="pm-quote__text">
+        "The best products start with really listening to the people you're building for.
+        That's true for grown-ups, and it's true for 1st graders too."
+      </p>
+      <p class="pm-quote__sig">— Ada's grown-up ✌️</p>
+    </div>
+
+  </main>
+
+  <footer class="foot">
+    <span>Built with 💚 to explain what Product Managers do.</span>
+    <span>Vision + Design + Engineering = 🦉</span>
+  </footer>
+</body>
+</html>

@@ -1,117 +1,9 @@
 /* =========================================
    SpiritZoo — app logic
    - Keyword-based spirit animal matching
-   - 15 kid-friendly animals
-   - Facts inspired by Nat Geo Kids
+   - ANIMALS data lives in animals-data.js
    ========================================= */
 
-const ANIMALS = {
-  owl: {
-    name: "The Owl",
-    emoji: "🦉",
-    tag: "Curious · Clever · Night-owl energy",
-    fact: "Owls can turn their heads almost all the way around — up to 270 degrees! That's because they can't move their eyes like we can, so their super-flexible necks do the work instead.",
-    keywords: ["read", "book", "smart", "study", "learn", "think", "quiet", "night", "curious", "question", "wise", "homework", "math", "science"]
-  },
-  cheetah: {
-    name: "The Cheetah",
-    emoji: "🐆",
-    tag: "Fast · Focused · Total speed demon",
-    fact: "A cheetah can go from zero to 60 miles per hour in just three seconds — that's faster than most sports cars! But they can only sprint that fast for about half a minute before getting tired.",
-    keywords: ["fast", "run", "speed", "race", "quick", "soccer", "track", "sprint", "athletic", "sport", "football", "basketball"]
-  },
-  dolphin: {
-    name: "The Dolphin",
-    emoji: "🐬",
-    tag: "Friendly · Playful · Loves the crew",
-    fact: "Dolphins give each other names! They use special whistle sounds to call their friends, and each dolphin has its very own signature whistle.",
-    keywords: ["friend", "swim", "water", "pool", "beach", "ocean", "social", "funny", "joke", "happy", "smile", "laugh", "play", "team"]
-  },
-  elephant: {
-    name: "The Elephant",
-    emoji: "🐘",
-    tag: "Kind · Caring · Never forgets a friend",
-    fact: "Elephants can recognize themselves in a mirror, and they really do have amazing memories — they can remember friends and family members for decades.",
-    keywords: ["kind", "help", "family", "remember", "memory", "gentle", "big", "care", "love", "hug", "nice", "sister", "brother", "mom", "dad", "grandma", "grandpa"]
-  },
-  penguin: {
-    name: "The Penguin",
-    emoji: "🐧",
-    tag: "Loyal · Warm-hearted · Squad goals",
-    fact: "Emperor penguins huddle together to stay warm in temperatures as cold as -60°F. They take turns standing on the outside of the group so everyone gets a chance to be in the cozy middle.",
-    keywords: ["cold", "snow", "ice", "winter", "slide", "waddle", "cute", "together", "group", "sharing", "share", "fair"]
-  },
-  dog: {
-    name: "The Dog",
-    emoji: "🐶",
-    tag: "Loyal · Joyful · Best friend forever",
-    fact: "A dog's sense of smell is up to 100,000 times stronger than ours! Some dogs can even sniff out illnesses before doctors notice them.",
-    keywords: ["dog", "puppy", "loyal", "loving", "cuddle", "pet", "walk", "fetch", "ball", "bark", "fur"]
-  },
-  cat: {
-    name: "The Cat",
-    emoji: "🐱",
-    tag: "Cool · Independent · A little mysterious",
-    fact: "Cats can make about 100 different sounds — way more than dogs, who only make about 10. And a cat's purr vibrates at a frequency that can actually help heal bones!",
-    keywords: ["cat", "kitten", "independent", "alone", "calm", "chill", "cozy", "nap", "sleep", "quiet", "mystery"]
-  },
-  monkey: {
-    name: "The Monkey",
-    emoji: "🐵",
-    tag: "Playful · Clever · Always up to something",
-    fact: "Capuchin monkeys use tools! They crack open nuts with rocks, and some even make their own brushes from leaves to put medicine on their fur.",
-    keywords: ["play", "climb", "tree", "jump", "silly", "funny", "goofy", "banana", "joke", "prank", "fun", "energy", "hyper"]
-  },
-  butterfly: {
-    name: "The Butterfly",
-    emoji: "🦋",
-    tag: "Creative · Colorful · Changing & growing",
-    fact: "Butterflies taste with their feet! When they land on a leaf or flower, they can immediately tell if it's something yummy or a good place to lay eggs.",
-    keywords: ["art", "draw", "paint", "color", "pretty", "dance", "music", "sing", "flower", "pink", "purple", "rainbow", "creative", "make", "craft"]
-  },
-  lion: {
-    name: "The Lion",
-    emoji: "🦁",
-    tag: "Brave · Bold · Born to lead",
-    fact: "A lion's roar is so loud it can be heard from 5 miles away! Lions live in family groups called prides, and they're the only big cats that live in groups.",
-    keywords: ["brave", "leader", "lead", "loud", "strong", "boss", "first", "captain", "king", "queen", "confident", "proud"]
-  },
-  turtle: {
-    name: "The Sea Turtle",
-    emoji: "🐢",
-    tag: "Patient · Calm · Takes the long view",
-    fact: "Sea turtles can hold their breath for hours when they're resting! And some sea turtles travel more than 10,000 miles across the ocean in their lifetime.",
-    keywords: ["slow", "calm", "patient", "careful", "think", "shy", "quiet", "chill", "relax"]
-  },
-  hummingbird: {
-    name: "The Hummingbird",
-    emoji: "🐦",
-    tag: "Energetic · Bright · Full of spark",
-    fact: "Hummingbirds can flap their wings up to 80 times per second and are the only birds that can fly backwards! Their hearts beat over 1,200 times a minute.",
-    keywords: ["energy", "fly", "bird", "bright", "zoom", "buzz", "busy", "active", "lively", "wiggle"]
-  },
-  otter: {
-    name: "The Sea Otter",
-    emoji: "🦦",
-    tag: "Playful · Warm · Pure good vibes",
-    fact: "Sea otters hold hands while they sleep so they don't drift apart on the water! They also carry a favorite rock in a pouch under their arm to crack open shells.",
-    keywords: ["cute", "cuddle", "hold", "hand", "float", "water", "play", "best", "friend", "nice", "sweet"]
-  },
-  fox: {
-    name: "The Fox",
-    emoji: "🦊",
-    tag: "Sly · Smart · A little sneaky (in a good way)",
-    fact: "Foxes use Earth's magnetic field to hunt! They always pounce in a northeast direction, which helps them catch their prey with amazing accuracy.",
-    keywords: ["sneaky", "clever", "trick", "hide", "seek", "puzzle", "game", "mystery", "detective", "solve", "orange", "red"]
-  },
-  panda: {
-    name: "The Panda",
-    emoji: "🐼",
-    tag: "Chill · Snacky · Expert at relaxing",
-    fact: "Pandas eat for up to 14 hours every single day — they munch through about 26 to 84 pounds of bamboo! Baby pandas are born tiny and pink, about the size of a stick of butter.",
-    keywords: ["food", "eat", "snack", "hungry", "pizza", "ice cream", "cookie", "sweet", "chocolate", "candy", "relax", "lazy", "sleep", "bed"]
-  }
-};
 
 /* ============ Matching logic ============ */
 function findSpiritAnimal(text) {
@@ -238,6 +130,104 @@ describeInput.addEventListener("keydown", (e) => {
   // Ctrl/Cmd+Enter to submit from textarea
   if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) handleDescribeSubmit();
 });
+
+/* ============ Microphone (Web Speech API) ============ */
+const micBtn = document.getElementById("mic-btn");
+const micStatus = document.getElementById("mic-status");
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let isListening = false;
+
+function setMicStatus(text, isError) {
+  micStatus.textContent = text || "";
+  micStatus.classList.toggle("mic-status--error", !!isError);
+}
+
+if (!SpeechRecognition) {
+  // Browser doesn't support it — show a friendly hint when tapped
+  micBtn.classList.add("mic-btn--unsupported");
+  micBtn.addEventListener("click", () => {
+    setMicStatus("Talking doesn't work in this browser — try Chrome or Safari! You can still type.", true);
+  });
+} else {
+  recognition = new SpeechRecognition();
+  recognition.continuous = true;       // keep listening so kids can pause while thinking
+  recognition.interimResults = true;   // show words as they're spoken
+  recognition.lang = "en-US";
+  recognition.maxAlternatives = 1;
+
+  let finalTranscript = "";
+  let startingText = "";
+
+  recognition.onstart = () => {
+    isListening = true;
+    micBtn.classList.add("mic-btn--listening");
+    micBtn.setAttribute("aria-label", "Tap to stop listening");
+    setMicStatus("🎙️ I'm listening! Tell me about you…");
+    // capture whatever's already typed so we append
+    startingText = describeInput.value.trim();
+    finalTranscript = "";
+  };
+
+  recognition.onresult = (event) => {
+    let interim = "";
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const result = event.results[i];
+      if (result.isFinal) {
+        finalTranscript += result[0].transcript + " ";
+      } else {
+        interim += result[0].transcript;
+      }
+    }
+    const combined = [startingText, (finalTranscript + interim).trim()]
+      .filter(Boolean)
+      .join(startingText ? " " : "");
+    describeInput.value = combined;
+  };
+
+  recognition.onerror = (event) => {
+    isListening = false;
+    micBtn.classList.remove("mic-btn--listening");
+    micBtn.setAttribute("aria-label", "Tap to talk to Gus");
+    if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+      setMicStatus("I need permission to hear you! Check your browser's microphone settings.", true);
+    } else if (event.error === "no-speech") {
+      setMicStatus("I didn't hear anything — try again!", true);
+    } else if (event.error === "audio-capture") {
+      setMicStatus("I can't find a microphone on this device.", true);
+    } else {
+      setMicStatus("Oops, something went wrong. Try typing instead!", true);
+    }
+  };
+
+  recognition.onend = () => {
+    isListening = false;
+    micBtn.classList.remove("mic-btn--listening");
+    micBtn.setAttribute("aria-label", "Tap to talk to Gus");
+    // Only clear status if not showing an error
+    if (!micStatus.classList.contains("mic-status--error")) {
+      if (describeInput.value.trim().length > startingText.length) {
+        setMicStatus("✨ Got it! Tap the mic again to add more, or hit 'Find my animal'.");
+      } else {
+        setMicStatus("");
+      }
+    }
+  };
+
+  micBtn.addEventListener("click", () => {
+    if (isListening) {
+      recognition.stop();
+    } else {
+      setMicStatus("");
+      try {
+        recognition.start();
+      } catch (err) {
+        // Already started — ignore
+      }
+    }
+  });
+}
 
 /* ============ Screen 3: Thinking ============ */
 const thinkingStatus = document.getElementById("thinking-status");

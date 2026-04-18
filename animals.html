@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>All the Animals · SpiritZoo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="bg-grain" aria-hidden="true"></div>
+  <div class="bg-blob bg-blob--1" aria-hidden="true"></div>
+  <div class="bg-blob bg-blob--2" aria-hidden="true"></div>
+
+  <header class="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__logo" style="text-decoration:none; color:inherit;">
+        <span class="nav__logo-mark">✦</span>
+        <span class="nav__logo-text">Spirit<span class="nav__logo-accent">Zoo</span></span>
+      </a>
+      <nav class="nav__links" aria-label="Primary">
+        <a href="animals.html" class="nav__link" aria-current="page" style="background: var(--cream-2);">Animals</a>
+        <a href="about.html" class="nav__link">About Gus</a>
+        <a href="pm.html" class="nav__link nav__link--badge">Made by a PM ✌️</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="subpage">
+    <a href="index.html" class="back-link">← Back to Gus</a>
+
+    <div class="subpage__header">
+      <p class="subpage__kicker">The whole crew</p>
+      <h1 class="subpage__title">Meet all <em>15 animals</em></h1>
+      <p class="subpage__lede">
+        Every kid gets matched to one of these based on what they tell Gus.
+        Each fun fact is inspired by Nat Geo Kids!
+      </p>
+    </div>
+
+    <div class="animal-grid" id="animal-grid">
+      <!-- Filled in by JavaScript -->
+    </div>
+  </main>
+
+  <footer class="foot">
+    <span>Built with 💚 to explain what Product Managers do.</span>
+    <span>Vision + Design + Engineering = 🦉</span>
+  </footer>
+
+  <script src="animals-data.js"></script>
+  <script>
+    // Render all animals into the grid
+    const grid = document.getElementById("animal-grid");
+    for (const [key, animal] of Object.entries(ANIMALS)) {
+      const tile = document.createElement("article");
+      tile.className = "animal-tile";
+      tile.innerHTML = `
+        <div class="animal-tile__emoji-box">${animal.emoji}</div>
+        <h2 class="animal-tile__name">${animal.name}</h2>
+        <p class="animal-tile__tag">${animal.tag}</p>
+        <p class="animal-tile__fact">${animal.fact}</p>
+      `;
+      grid.appendChild(tile);
+    }
+  </script>
+</body>
+</html>
