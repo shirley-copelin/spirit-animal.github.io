@@ -306,6 +306,21 @@ document.getElementById("try-again").addEventListener("click", () => {
   setTimeout(() => describeInput.focus(), 400);
 });
 
+/* ============ Restart (back to the very beginning) ============ */
+document.getElementById("restart").addEventListener("click", () => {
+  // Clear everything so the next kid starts fresh
+  nameInput.value = "";
+  describeInput.value = "";
+  kidName = "";
+  // Also clear any lingering mic status messages
+  const nameMicStatus = document.getElementById("name-mic-status");
+  const micStatus = document.getElementById("mic-status");
+  if (nameMicStatus) nameMicStatus.textContent = "";
+  if (micStatus) micStatus.textContent = "";
+  showScreen("greet");
+  setTimeout(() => nameInput.focus(), 400);
+});
+
 /* ============ Input shake animation ============ */
 const styleSheet = document.createElement("style");
 styleSheet.textContent = `
