@@ -108,5 +108,78 @@ const ANIMALS = {
     tag: "Chill · Snacky · Expert at relaxing",
     fact: "Pandas eat for up to 14 hours every single day — they munch through about 26 to 84 pounds of bamboo! Baby pandas are born tiny and pink, about the size of a stick of butter.",
     keywords: ["food", "eat", "snack", "hungry", "pizza", "ice cream", "cookie", "sweet", "chocolate", "candy", "relax", "lazy", "sleep", "bed"]
+  },
+
+  /* ---------- Australian animals (inspired by Brisbane Kids) ---------- */
+
+  koala: {
+    name: "The Koala",
+    emoji: "🐨",
+    tag: "Sleepy · Soft · A master of cozy",
+    fact: "Koalas sleep up to 20 hours a day! They only eat eucalyptus leaves, and they have six opposable 'thumbs' to help them grip tree branches.",
+    keywords: ["sleepy", "tired", "nap", "cozy", "tree", "hug", "soft", "teddy", "blanket", "pajamas", "bedtime"]
+  },
+  kangaroo: {
+    name: "The Kangaroo",
+    emoji: "🦘",
+    tag: "Bouncy · Bold · Always moving forward",
+    fact: "Kangaroos can't walk backwards! They live in groups called mobs that can have up to 50 kangaroos, and the faster they hop, the less energy they use.",
+    keywords: ["jump", "hop", "bounce", "forward", "trampoline", "skip", "tall", "mom", "pocket"]
+  },
+  quokka: {
+    name: "The Quokka",
+    emoji: "😄",
+    tag: "Happy · Smiley · The world's cheeriest animal",
+    fact: "Quokkas are called the happiest animal in the world because they always look like they're smiling! They live on a special island in Australia called Rottnest Island.",
+    keywords: ["happy", "smile", "smiling", "cheerful", "positive", "grin", "good mood", "sunshine", "giggle", "laugh a lot", "joyful"]
+  },
+  wombat: {
+    name: "The Wombat",
+    emoji: "🐻",
+    tag: "Cozy · Burrow-builder · Quietly powerful",
+    fact: "Wombats dig huge underground tunnels that can be 100 feet long! Weirdest of all — their poop comes out in the shape of a cube. Scientists still aren't totally sure why!",
+    keywords: ["dig", "build", "tunnel", "hide out", "fort", "home", "builder", "construction", "underground", "cave"]
+  },
+  platypus: {
+    name: "The Platypus",
+    emoji: "🦫",
+    tag: "Unique · One-of-a-kind · Delightfully weird",
+    fact: "The platypus has a duck's bill, a beaver's tail, webbed feet, AND it lays eggs — even though it's a mammal! When scientists first saw one, they thought it was a prank.",
+    keywords: ["different", "unique", "weird", "special", "unusual", "one of a kind", "original", "strange", "cool", "quirky"]
+  },
+  echidna: {
+    name: "The Echidna",
+    emoji: "🦔",
+    tag: "Spiky outside · Sweet inside · Ant-snack connoisseur",
+    fact: "Echidnas are covered in spines that are actually super-thick hollow hairs! They slurp up ants and bugs with a tongue that can stretch six inches long.",
+    keywords: ["prickly", "spike", "careful", "protect", "tough on outside", "sensitive", "spicy", "small but mighty"]
+  },
+  kookaburra: {
+    name: "The Kookaburra",
+    emoji: "🪶",
+    tag: "Loud · Funny · The laughing bird",
+    fact: "The kookaburra's call sounds exactly like a person laughing — which is why it's nicknamed the 'laughing bird'! They sing most loudly at sunrise and sunset.",
+    keywords: ["laugh", "giggle", "loud laugh", "hilarious", "comedian", "tell jokes", "crack up", "class clown"]
+  },
+  emu: {
+    name: "The Emu",
+    emoji: "🦩",
+    tag: "Tall · Speedy · Dad of the year",
+    fact: "Emus are huge flightless birds that can run 30 miles per hour! The daddy emu is the one who sits on the eggs and takes care of the babies for up to two years.",
+    keywords: ["tall", "long legs", "zoom", "race", "dad", "father", "take care", "big", "run fast"]
+  },
+  lorikeet: {
+    name: "The Rainbow Lorikeet",
+    emoji: "🦜",
+    tag: "Colorful · Chatty · Full of personality",
+    fact: "Rainbow lorikeets are covered in every color of the rainbow and have special brush-tipped tongues to slurp up flower nectar. They travel in big, noisy, chatty groups!",
+    keywords: ["talk", "chat", "chatty", "colorful", "loud", "social", "noisy", "rainbow", "group", "talk a lot", "loud voice"]
+  },
+  sugarglider: {
+    name: "The Sugar Glider",
+    emoji: "🐿️",
+    tag: "Sweet · Adventurous · Tiny daredevil",
+    fact: "Sugar gliders are tiny marsupials that can glide through the air for up to 150 feet using a special flap of skin between their arms and legs — like a furry little superhero cape!",
+    keywords: ["adventure", "brave", "fly", "glide", "daring", "climb up high", "tree top", "little", "small", "tiny", "super hero", "explore"]
   }
 };
