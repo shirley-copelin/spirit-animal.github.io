@@ -54,19 +54,35 @@
         </h1>
 
         <div class="input-row">
-          <input
-            id="name-input"
-            type="text"
-            class="field"
-            placeholder="Type your name here…"
-            autocomplete="off"
-            maxlength="30"
-          />
+          <div class="field-with-mic">
+            <input
+              id="name-input"
+              type="text"
+              class="field"
+              placeholder="Type or tap the mic…"
+              autocomplete="off"
+              maxlength="30"
+            />
+            <button
+              id="name-mic-btn"
+              class="mic-btn mic-btn--inline"
+              type="button"
+              aria-label="Tap to say your name"
+              title="Tap to say your name"
+            >
+              <svg class="mic-btn__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" fill="currentColor"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3M8 22h8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+              </svg>
+              <span class="mic-btn__pulse" aria-hidden="true"></span>
+            </button>
+          </div>
           <button id="name-submit" class="btn btn--primary">
             Let's go
             <span class="btn__arrow">→</span>
           </button>
         </div>
+        <p class="mic-status" id="name-mic-status" aria-live="polite"></p>
 
         <p class="fineprint">Don't worry — Gus doesn't save anything. Pinky promise.</p>
       </div>

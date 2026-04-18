@@ -439,6 +439,26 @@ body {
   background: var(--cream-2);
 }
 
+/* Inline variant — sits next to a single-line input */
+.field-with-mic {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.field-with-mic .field {
+  flex: 1;
+  min-width: 0;
+}
+.mic-btn--inline {
+  position: static;
+  flex-shrink: 0;
+  width: 54px;
+  height: 54px;
+}
+
 @keyframes micPulse {
   0%   { opacity: 0.6; transform: scale(1); }
   100% { opacity: 0;   transform: scale(1.8); }

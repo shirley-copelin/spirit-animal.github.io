@@ -132,41 +132,53 @@ describeInput.addEventListener("keydown", (e) => {
 });
 
 /* ============ Microphone (Web Speech API) ============ */
-const micBtn = document.getElementById("mic-btn");
-const micStatus = document.getElementById("mic-status");
-
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-let recognition = null;
-let isListening = false;
 
-function setMicStatus(text, isError) {
-  micStatus.textContent = text || "";
-  micStatus.classList.toggle("mic-status--error", !!isError);
-}
+/**
+ * Wire up a mic button to an input/textarea field.
+ * Options:
+ *   singleLine: if true, treat as a name field (only first word, strip punctuation)
+ *   listeningMsg: status shown while listening
+ *   doneMsg:      status shown after a successful capture
+ */
+function setupMic({ btn, input, status, singleLine = false, listeningMsg, doneMsg }) {
+  if (!btn) return;
 
-if (!SpeechRecognition) {
-  // Browser doesn't support it — show a friendly hint when tapped
-  micBtn.classList.add("mic-btn--unsupported");
-  micBtn.addEventListener("click", () => {
-    setMicStatus("Talking doesn't work in this browser — try Chrome or Safari! You can still type.", true);
-  });
-} else {
-  recognition = new SpeechRecognition();
-  recognition.continuous = true;       // keep listening so kids can pause while thinking
-  recognition.interimResults = true;   // show words as they're spoken
+  const setStatus = (text, isError) => {
+    if (!status) return;
+    status.textContent = text || "";
+    status.classList.toggle("mic-status--error", !!isError);
+  };
+
+  if (!SpeechRecognition) {
+    btn.classList.add("mic-btn--unsupported");
+    btn.addEventListener("click", () => {
+      setStatus("Talking doesn't work in this browser — try Chrome or Safari! You can still type.", true);
+    });
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+  recognition.continuous = !singleLine;    // name mode: capture one phrase and stop
+  recognition.interimResults = true;
   recognition.lang = "en-US";
   recognition.maxAlternatives = 1;
 
+  let isListening = false;
   let finalTranscript = "";
   let startingText = "";
 
+  const cleanForName = (raw) => {
+    // Keep only letters/spaces, take first word, capitalize handled elsewhere
+    return raw.replace(/[^A-Za-z\s'-]/g, "").trim().split(/\s+/)[0] || "";
+  };
+
   recognition.onstart = () => {
     isListening = true;
-    micBtn.classList.add("mic-btn--listening");
-    micBtn.setAttribute("aria-label", "Tap to stop listening");
-    setMicStatus("🎙️ I'm listening! Tell me about you…");
-    // capture whatever's already typed so we append
-    startingText = describeInput.value.trim();
+    btn.classList.add("mic-btn--listening");
+    btn.setAttribute("aria-label", "Tap to stop listening");
+    setStatus(listeningMsg || "🎙️ I'm listening…");
+    startingText = singleLine ? "" : input.value.trim();
     finalTranscript = "";
   };
 
@@ -180,54 +192,77 @@ if (!SpeechRecognition) {
         interim += result[0].transcript;
       }
     }
-    const combined = [startingText, (finalTranscript + interim).trim()]
-      .filter(Boolean)
-      .join(startingText ? " " : "");
-    describeInput.value = combined;
+    const heard = (finalTranscript + interim).trim();
+
+    if (singleLine) {
+      input.value = cleanForName(heard);
+      // Auto-stop when we have a final result — one word is enough for a name
+      if (finalTranscript.trim().length > 0) {
+        try { recognition.stop(); } catch (e) { /* ignore */ }
+      }
+    } else {
+      input.value = [startingText, heard]
+        .filter(Boolean)
+        .join(startingText ? " " : "");
+    }
   };
 
   recognition.onerror = (event) => {
     isListening = false;
-    micBtn.classList.remove("mic-btn--listening");
-    micBtn.setAttribute("aria-label", "Tap to talk to Gus");
+    btn.classList.remove("mic-btn--listening");
+    btn.setAttribute("aria-label", "Tap to talk to Gus");
     if (event.error === "not-allowed" || event.error === "service-not-allowed") {
-      setMicStatus("I need permission to hear you! Check your browser's microphone settings.", true);
+      setStatus("I need permission to hear you! Check your browser's microphone settings.", true);
     } else if (event.error === "no-speech") {
-      setMicStatus("I didn't hear anything — try again!", true);
+      setStatus("I didn't hear anything — try again!", true);
     } else if (event.error === "audio-capture") {
-      setMicStatus("I can't find a microphone on this device.", true);
+      setStatus("I can't find a microphone on this device.", true);
     } else {
-      setMicStatus("Oops, something went wrong. Try typing instead!", true);
+      setStatus("Oops, something went wrong. Try typing instead!", true);
     }
   };
 
   recognition.onend = () => {
     isListening = false;
-    micBtn.classList.remove("mic-btn--listening");
-    micBtn.setAttribute("aria-label", "Tap to talk to Gus");
-    // Only clear status if not showing an error
-    if (!micStatus.classList.contains("mic-status--error")) {
-      if (describeInput.value.trim().length > startingText.length) {
-        setMicStatus("✨ Got it! Tap the mic again to add more, or hit 'Find my animal'.");
-      } else {
-        setMicStatus("");
-      }
+    btn.classList.remove("mic-btn--listening");
+    btn.setAttribute("aria-label", "Tap to talk to Gus");
+    if (status && !status.classList.contains("mic-status--error")) {
+      const gotSomething = singleLine
+        ? input.value.trim().length > 0
+        : input.value.trim().length > startingText.length;
+      setStatus(gotSomething ? (doneMsg || "✨ Got it!") : "");
     }
   };
 
-  micBtn.addEventListener("click", () => {
+  btn.addEventListener("click", () => {
     if (isListening) {
       recognition.stop();
     } else {
-      setMicStatus("");
-      try {
-        recognition.start();
-      } catch (err) {
-        // Already started — ignore
-      }
+      setStatus("");
+      try { recognition.start(); } catch (err) { /* already started — ignore */ }
     }
   });
 }
+
+// Wire up the describe (3-things) mic
+setupMic({
+  btn:    document.getElementById("mic-btn"),
+  input:  describeInput,
+  status: document.getElementById("mic-status"),
+  singleLine: false,
+  listeningMsg: "🎙️ I'm listening! Tell me about you…",
+  doneMsg:      "✨ Got it! Tap the mic again to add more, or hit 'Find my animal'."
+});
+
+// Wire up the name mic
+setupMic({
+  btn:    document.getElementById("name-mic-btn"),
+  input:  nameInput,
+  status: document.getElementById("name-mic-status"),
+  singleLine: true,
+  listeningMsg: "🎙️ I'm listening! Say your name…",
+  doneMsg:      "✨ Got it! Tap 'Let's go' to continue."
+});
 
 /* ============ Screen 3: Thinking ============ */
 const thinkingStatus = document.getElementById("thinking-status");
