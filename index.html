@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meet Gus · Your Spirit Animal Finder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Decorative background grain & shapes -->
+  <div class="bg-grain" aria-hidden="true"></div>
+  <div class="bg-blob bg-blob--1" aria-hidden="true"></div>
+  <div class="bg-blob bg-blob--2" aria-hidden="true"></div>
+
+  <!-- Top nav bar (Back Market-inspired) -->
+  <header class="nav">
+    <div class="nav__inner">
+      <div class="nav__logo">
+        <span class="nav__logo-mark">✦</span>
+        <span class="nav__logo-text">Spirit<span class="nav__logo-accent">Zoo</span></span>
+      </div>
+      <nav class="nav__links" aria-label="Primary">
+        <a href="#" class="nav__link">Animals</a>
+        <a href="#" class="nav__link">About Gus</a>
+        <a href="#" class="nav__link nav__link--badge">Made by a PM ✌️</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="stage">
+
+    <!-- STEP 1: Greeting from Gus -->
+    <section class="screen screen--active" id="screen-greet" aria-labelledby="greet-title">
+      <div class="card">
+        <div class="avatar" aria-hidden="true">
+          <div class="avatar__orb">
+            <div class="avatar__face">
+              <div class="avatar__eye avatar__eye--l"></div>
+              <div class="avatar__eye avatar__eye--r"></div>
+              <div class="avatar__mouth"></div>
+            </div>
+            <div class="avatar__antenna"></div>
+          </div>
+          <div class="avatar__shadow"></div>
+        </div>
+
+        <p class="kicker">A tiny greeting</p>
+        <h1 id="greet-title" class="headline">
+          Hey, my name is <span class="headline__accent">Gus</span>.<br>
+          What's <em>your</em> name?
+        </h1>
+
+        <div class="input-row">
+          <input
+            id="name-input"
+            type="text"
+            class="field"
+            placeholder="Type your name here…"
+            autocomplete="off"
+            maxlength="30"
+          />
+          <button id="name-submit" class="btn btn--primary">
+            Let's go
+            <span class="btn__arrow">→</span>
+          </button>
+        </div>
+
+        <p class="fineprint">Don't worry — Gus doesn't save anything. Pinky promise.</p>
+      </div>
+    </section>
+
+    <!-- STEP 2: Ask for 3 things -->
+    <section class="screen" id="screen-describe" aria-labelledby="describe-title" hidden>
+      <div class="card">
+        <div class="avatar avatar--small" aria-hidden="true">
+          <div class="avatar__orb">
+            <div class="avatar__face">
+              <div class="avatar__eye avatar__eye--l"></div>
+              <div class="avatar__eye avatar__eye--r"></div>
+              <div class="avatar__mouth avatar__mouth--smile"></div>
+            </div>
+            <div class="avatar__antenna"></div>
+          </div>
+        </div>
+
+        <p class="kicker">Nice to meet you <span id="name-echo">friend</span> ✨</p>
+        <h2 id="describe-title" class="headline">
+          I'd love to find your <span class="headline__accent">spirit animal</span>.<br>
+          Tell me 3 things about yourself!
+        </h2>
+
+        <p class="hint">Like… what you love, what you're good at, or what makes you, <em>you</em>.</p>
+
+        <textarea
+          id="describe-input"
+          class="field field--area"
+          placeholder="Example: I love reading books. I'm really fast at soccer. I'm super curious about space!"
+          rows="4"
+          maxlength="400"
+        ></textarea>
+
+        <div class="input-row input-row--end">
+          <button id="describe-back" class="btn btn--ghost">← Back</button>
+          <button id="describe-submit" class="btn btn--primary">
+            Find my animal
+            <span class="btn__arrow">→</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 3: Thinking -->
+    <section class="screen" id="screen-thinking" aria-labelledby="thinking-title" hidden>
+      <div class="card card--center">
+        <div class="thinker">
+          <div class="thinker__disc"></div>
+          <div class="thinker__disc thinker__disc--2"></div>
+          <div class="thinker__disc thinker__disc--3"></div>
+          <div class="thinker__core">✦</div>
+        </div>
+        <h2 id="thinking-title" class="headline headline--center">
+          Gus is thinking<span class="dots"><span>.</span><span>.</span><span>.</span></span>
+        </h2>
+        <p class="thinking-status" id="thinking-status">Reading your answer…</p>
+      </div>
+    </section>
+
+    <!-- STEP 4: Reveal -->
+    <section class="screen" id="screen-reveal" aria-labelledby="reveal-title" hidden>
+      <div class="card card--reveal">
+        <div class="confetti" aria-hidden="true"></div>
+
+        <p class="kicker">You're the best, <span id="name-echo-2">friend</span>!</p>
+        <h2 id="reveal-title" class="headline">
+          Did you know your spirit animal is&hellip;
+        </h2>
+
+        <div class="animal-card">
+          <div class="animal-card__emoji" id="animal-emoji">🦉</div>
+          <div class="animal-card__name" id="animal-name">The Owl</div>
+          <div class="animal-card__tag" id="animal-tag">Curious · Clever · Night-owl energy</div>
+        </div>
+
+        <div class="fact-box">
+          <div class="fact-box__label">🌍 Fun fact from Nat Geo Kids</div>
+          <p class="fact-box__text" id="animal-fact">…</p>
+        </div>
+
+        <div class="input-row input-row--center">
+          <button id="try-again" class="btn btn--primary">
+            Try again
+            <span class="btn__arrow">↻</span>
+          </button>
+        </div>
+
+        <p class="fineprint">
+          Facts inspired by
+          <a href="https://www.natgeokids.com/ie/category/discover/animals/" target="_blank" rel="noopener">Nat Geo Kids</a>
+          · Go explore more animals there!
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="foot">
+    <span>Built with 💚 to explain what Product Managers do.</span>
+    <span>Vision + Design + Engineering = 🦉</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
