@@ -5,43 +5,61 @@
    ========================================= */
 
 
-/* ============ Matching logic ============ */
+/* ============ Matching logic ============
+   How this works:
+   1. Score every animal by how many of its keywords show up in the text
+   2. Instead of ALWAYS picking the single highest score, we consider
+      animals that are "close enough" to the top (within 1 point) as
+      co-finalists. This lets less-common animals win more often.
+   3. Among co-finalists, pick one randomly — but give higher-scoring
+      animals more weight (so the best match is still usually chosen).
+   4. If nothing matches at all, pick from a friendly fallback list.
+============================================ */
 function findSpiritAnimal(text) {
   const normalized = text.toLowerCase();
   const scores = {};
 
-  // Score each animal by keyword hits
+  // Step 1: score each animal by keyword hits
   for (const [key, animal] of Object.entries(ANIMALS)) {
     scores[key] = 0;
     for (const kw of animal.keywords) {
-      // simple substring match is best for kid input
-      if (normalized.includes(kw)) {
+      if (normalized.includes(kw.toLowerCase())) {
         scores[key] += 1;
       }
     }
   }
 
-  // Find max score
+  // Step 2: find the top score
   let maxScore = 0;
-  let winners = [];
-  for (const [key, score] of Object.entries(scores)) {
-    if (score > maxScore) {
-      maxScore = score;
-      winners = [key];
-    } else if (score === maxScore && score > 0) {
-      winners.push(key);
-    }
+  for (const score of Object.values(scores)) {
+    if (score > maxScore) maxScore = score;
   }
 
-  // If nothing matched, pick a random fun animal so every kid gets something
+  // Step 3: if nothing matched, random fallback
   if (maxScore === 0) {
-    const friendlyFallbacks = ["dolphin", "otter", "fox", "hummingbird", "butterfly", "panda"];
+    const friendlyFallbacks = [
+      "dolphin", "otter", "fox", "hummingbird", "butterfly", "panda",
+      "quokka", "koala", "platypus", "sugarglider", "lorikeet"
+    ];
     const pick = friendlyFallbacks[Math.floor(Math.random() * friendlyFallbacks.length)];
     return ANIMALS[pick];
   }
 
-  // If tied, pick one of the winners randomly
-  const winnerKey = winners[Math.floor(Math.random() * winners.length)];
+  // Step 4: gather "co-finalists" — animals within 1 point of the max score
+  // This lets us bring some variety: if elephant scores 3 and dolphin scores 2,
+  // both are in the running (instead of elephant always winning).
+  const contenders = [];
+  for (const [key, score] of Object.entries(scores)) {
+    if (score >= maxScore - 1 && score > 0) {
+      // Weight: top scorers get more tickets in the "raffle"
+      // Score of maxScore → 3 tickets, score of maxScore-1 → 1 ticket
+      const tickets = score === maxScore ? 3 : 1;
+      for (let i = 0; i < tickets; i++) contenders.push(key);
+    }
+  }
+
+  // Step 5: random pick among weighted contenders
+  const winnerKey = contenders[Math.floor(Math.random() * contenders.length)];
   return ANIMALS[winnerKey];
 }
 
@@ -307,19 +325,22 @@ document.getElementById("try-again").addEventListener("click", () => {
 });
 
 /* ============ Restart (back to the very beginning) ============ */
-document.getElementById("restart").addEventListener("click", () => {
-  // Clear everything so the next kid starts fresh
-  nameInput.value = "";
-  describeInput.value = "";
-  kidName = "";
-  // Also clear any lingering mic status messages
-  const nameMicStatus = document.getElementById("name-mic-status");
-  const micStatus = document.getElementById("mic-status");
-  if (nameMicStatus) nameMicStatus.textContent = "";
-  if (micStatus) micStatus.textContent = "";
-  showScreen("greet");
-  setTimeout(() => nameInput.focus(), 400);
-});
+const restartBtn = document.getElementById("restart");
+if (restartBtn) {
+  restartBtn.addEventListener("click", () => {
+    // Clear everything so the next kid starts fresh
+    if (nameInput) nameInput.value = "";
+    if (describeInput) describeInput.value = "";
+    kidName = "";
+    // Also clear any lingering mic status messages
+    const nameMicStatus = document.getElementById("name-mic-status");
+    const micStatus = document.getElementById("mic-status");
+    if (nameMicStatus) nameMicStatus.textContent = "";
+    if (micStatus) micStatus.textContent = "";
+    showScreen("greet");
+    setTimeout(() => { if (nameInput) nameInput.focus(); }, 400);
+  });
+}
 
 /* ============ Input shake animation ============ */
 const styleSheet = document.createElement("style");
