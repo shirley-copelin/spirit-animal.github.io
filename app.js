@@ -8,12 +8,13 @@
 /* ============ Matching logic ============
    How this works:
    1. Score every animal by how many of its keywords show up in the text
-   2. Instead of ALWAYS picking the single highest score, we consider
-      animals that are "close enough" to the top (within 1 point) as
-      co-finalists. This lets less-common animals win more often.
-   3. Among co-finalists, pick one randomly — but give higher-scoring
-      animals more weight (so the best match is still usually chosen).
-   4. If nothing matches at all, pick from a friendly fallback list.
+   2. We consider ALL animals that scored at least half the top score as
+      co-finalists (was: within 1 point). This is much more generous.
+   3. Among co-finalists, pick one randomly — with only mild weighting so
+      lower-scoring contenders really do win sometimes.
+   4. If nothing matched, or only ONE animal matched (and weakly), we
+      sprinkle in random "wildcard" animals too so kids aren't stuck
+      with the same handful of results.
 ============================================ */
 function findSpiritAnimal(text) {
   const normalized = text.toLowerCase();
@@ -35,30 +36,41 @@ function findSpiritAnimal(text) {
     if (score > maxScore) maxScore = score;
   }
 
-  // Step 3: if nothing matched, random fallback
+  const allKeys = Object.keys(ANIMALS);
+
+  // Step 3: if nothing matched at all, pick randomly from a broad set
   if (maxScore === 0) {
-    const friendlyFallbacks = [
-      "dolphin", "otter", "fox", "hummingbird", "butterfly", "panda",
-      "quokka", "koala", "platypus", "sugarglider", "lorikeet"
-    ];
-    const pick = friendlyFallbacks[Math.floor(Math.random() * friendlyFallbacks.length)];
+    const pick = allKeys[Math.floor(Math.random() * allKeys.length)];
     return ANIMALS[pick];
   }
 
-  // Step 4: gather "co-finalists" — animals within 1 point of the max score
-  // This lets us bring some variety: if elephant scores 3 and dolphin scores 2,
-  // both are in the running (instead of elephant always winning).
+  // Step 4: gather contenders — any animal scoring >= half the max (rounded down)
+  // Plus: always include animals with a perfect top score.
+  // This opens the field much wider than before.
+  const threshold = Math.max(1, Math.floor(maxScore / 2));
   const contenders = [];
+
   for (const [key, score] of Object.entries(scores)) {
-    if (score >= maxScore - 1 && score > 0) {
-      // Weight: top scorers get more tickets in the "raffle"
-      // Score of maxScore → 3 tickets, score of maxScore-1 → 1 ticket
-      const tickets = score === maxScore ? 3 : 1;
+    if (score >= threshold) {
+      // Gentler weighting: max-scorer gets 2 tickets, everyone else gets 1
+      // (was 3:1 before — now much more of a roll of the dice)
+      const tickets = score === maxScore ? 2 : 1;
       for (let i = 0; i < tickets; i++) contenders.push(key);
     }
   }
 
-  // Step 5: random pick among weighted contenders
+  // Step 5: for weak matches (only 1 keyword hit), sprinkle in 3 random wildcards
+  // so we don't keep landing on the same few animals for vague descriptions.
+  if (maxScore === 1) {
+    const contenderSet = new Set(contenders);
+    const wildcards = allKeys
+      .filter(k => !contenderSet.has(k))
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 3);
+    contenders.push(...wildcards);
+  }
+
+  // Step 6: random pick among weighted contenders
   const winnerKey = contenders[Math.floor(Math.random() * contenders.length)];
   return ANIMALS[winnerKey];
 }
@@ -185,6 +197,17 @@ function setupMic({ btn, input, status, singleLine = false, listeningMsg, doneMs
   let isListening = false;
   let finalTranscript = "";
   let startingText = "";
+  let timeoutId = null;  // Auto-stop timer
+
+  // Hard cap: stop listening after 15 seconds no matter what
+  const MAX_LISTEN_MS = 15000;
+
+  const clearTimeoutSafe = () => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      timeoutId = null;
+    }
+  };
 
   const cleanForName = (raw) => {
     // Keep only letters/spaces, take first word, capitalize handled elsewhere
@@ -198,6 +221,13 @@ function setupMic({ btn, input, status, singleLine = false, listeningMsg, doneMs
     setStatus(listeningMsg || "🎙️ I'm listening…");
     startingText = singleLine ? "" : input.value.trim();
     finalTranscript = "";
+
+    // Start the 15-second safety timer
+    clearTimeoutSafe();
+    timeoutId = setTimeout(() => {
+      try { recognition.stop(); } catch (e) { /* ignore */ }
+      setStatus("⏰ Time's up! Tap the mic again to keep going.");
+    }, MAX_LISTEN_MS);
   };
 
   recognition.onresult = (event) => {
@@ -216,6 +246,7 @@ function setupMic({ btn, input, status, singleLine = false, listeningMsg, doneMs
       input.value = cleanForName(heard);
       // Auto-stop when we have a final result — one word is enough for a name
       if (finalTranscript.trim().length > 0) {
+        clearTimeoutSafe();
         try { recognition.stop(); } catch (e) { /* ignore */ }
       }
     } else {
@@ -226,6 +257,7 @@ function setupMic({ btn, input, status, singleLine = false, listeningMsg, doneMs
   };
 
   recognition.onerror = (event) => {
+    clearTimeoutSafe();
     isListening = false;
     btn.classList.remove("mic-btn--listening");
     btn.setAttribute("aria-label", "Tap to talk to Gus");
@@ -241,10 +273,14 @@ function setupMic({ btn, input, status, singleLine = false, listeningMsg, doneMs
   };
 
   recognition.onend = () => {
+    clearTimeoutSafe();
     isListening = false;
     btn.classList.remove("mic-btn--listening");
     btn.setAttribute("aria-label", "Tap to talk to Gus");
     if (status && !status.classList.contains("mic-status--error")) {
+      // Don't overwrite a timeout message that was just set
+      const currentStatus = status.textContent || "";
+      if (currentStatus.startsWith("⏰")) return;
       const gotSomething = singleLine
         ? input.value.trim().length > 0
         : input.value.trim().length > startingText.length;
@@ -254,6 +290,7 @@ function setupMic({ btn, input, status, singleLine = false, listeningMsg, doneMs
 
   btn.addEventListener("click", () => {
     if (isListening) {
+      clearTimeoutSafe();
       recognition.stop();
     } else {
       setStatus("");
@@ -320,9 +357,17 @@ function revealAnimal(animal) {
 /* ============ Try again ============ */
 document.getElementById("try-again").addEventListener("click", () => {
   stopSpeakingIfAny();
+  // Clear the describe input thoroughly — some browsers autofill on navigation
   describeInput.value = "";
+  describeInput.setAttribute("value", "");
+  // Also clear any leftover mic status
+  const micStatus = document.getElementById("mic-status");
+  if (micStatus) micStatus.textContent = "";
   showScreen("describe");
-  setTimeout(() => describeInput.focus(), 400);
+  setTimeout(() => {
+    describeInput.value = "";  // second pass in case of autofill repopulation
+    describeInput.focus();
+  }, 400);
 });
 
 /* ============ Read to me (text-to-speech) ============
@@ -337,34 +382,57 @@ function pickFriendlyVoice() {
   const voices = window.speechSynthesis.getVoices();
   if (!voices.length) return null;
 
-  // Prefer these by name — they're consistently the warmest female voices
-  // across platforms. Higher-indexed = higher preference.
+  // Priority order: modern neural/cloud voices first (they sound way more natural
+  // than the older classic voices). We strongly prefer en-US female voices
+  // without regional accents (no Irish/Scottish/Australian/Indian).
   const preferredNames = [
-    "Samantha",        // macOS / iOS — great warm tone, works on most Apple devices
-    "Karen",           // macOS — Australian warmth
-    "Google US English", // Chrome female voice
-    "Microsoft Aria",  // Windows — newer natural voice
-    "Microsoft Jenny", // Windows — newer natural voice
-    "Microsoft Zira",  // Windows — older fallback
-    "Moira",           // macOS — Irish-English
-    "Tessa"            // macOS
+    // Highest quality first:
+    "Google US English",   // Chrome — one of the most natural
+    "Microsoft Aria",      // Windows 11 — neural, very natural
+    "Microsoft Jenny",     // Windows 11 — neural, very natural
+    "Microsoft Ava",       // Windows 11 neural
+    "Microsoft Emma",      // Windows 11 neural
+    "Microsoft Michelle",  // Windows 11 neural
+    // Apple voices — Samantha can sound uncanny but is widely available
+    "Ava",                 // iOS 17+ — newer, more natural
+    "Allison",             // macOS — warm US voice
+    "Susan",               // macOS — US
+    "Nicky",               // macOS — US
+    "Samantha",            // macOS / iOS — classic fallback
+    // Older Windows fallback
+    "Microsoft Zira"
   ];
 
   const scoreVoice = (v) => {
+    const name = v.name || "";
+    const lang = v.lang || "";
     let score = 0;
-    // Must be English-ish
-    if (!/^en/i.test(v.lang || "")) return -1;
-    // Prefer en-US and en-GB slightly
-    if (/^en-US/i.test(v.lang)) score += 3;
-    if (/^en-GB/i.test(v.lang)) score += 2;
-    // Name-based preference (the big signal)
-    preferredNames.forEach((name, i) => {
-      if ((v.name || "").includes(name)) score += 20 + i;
+
+    // Must be English
+    if (!/^en/i.test(lang)) return -1;
+
+    // STRONG preference for en-US (avoids accents)
+    if (/^en-US/i.test(lang)) score += 10;
+    else if (/^en-GB/i.test(lang)) score += 2;
+    else score -= 5;  // en-AU, en-IE, en-IN, en-ZA etc.
+
+    // Name-based preference — earlier in list = higher score
+    preferredNames.forEach((prefName, i) => {
+      if (name.includes(prefName)) {
+        score += 50 + (preferredNames.length - i);
+      }
     });
-    // "Female" in the name is a strong hint
-    if (/female/i.test(v.name)) score += 10;
-    // Avoid known male voices
-    if (/(Daniel|Alex|Fred|Thomas|Rishi|male)/i.test(v.name)) score -= 15;
+
+    // "female" in name is a strong hint
+    if (/female/i.test(name)) score += 15;
+
+    // Penalize male names and accented voices
+    if (/(Daniel|Alex|Fred|Thomas|Rishi|Aaron|Arthur|Oliver|male)/i.test(name)) score -= 50;
+    if (/(Moira|Tessa|Karen|Fiona|Veena|Rishi|Irish|Scottish|Indian|Australian|South African)/i.test(name)) score -= 20;
+
+    // Prefer "Enhanced" / "Premium" / "Neural" / "Natural" variants
+    if (/(enhanced|premium|neural|natural|online)/i.test(name)) score += 8;
+
     return score;
   };
 
@@ -373,7 +441,7 @@ function pickFriendlyVoice() {
     .filter(x => x.s >= 0)
     .sort((a, b) => b.s - a.s)[0];
 
-  return best ? best.v : voices.find(v => /^en/i.test(v.lang)) || voices[0];
+  return best ? best.v : (voices.find(v => /^en-US/i.test(v.lang)) || voices.find(v => /^en/i.test(v.lang)) || voices[0]);
 }
 
 // Voices load asynchronously in some browsers — prime the list
@@ -406,8 +474,8 @@ function speakAnimal() {
   const utter = new SpeechSynthesisUtterance(text);
   const voice = pickFriendlyVoice();
   if (voice) utter.voice = voice;
-  utter.rate = 0.95;   // slightly slower for 1st graders
-  utter.pitch = 1.1;   // a touch brighter / warmer
+  utter.rate = 1.05;   // slightly faster than normal — feels more natural & lively
+  utter.pitch = 1.05;  // very slight lift to feel warm, not shrill
   utter.volume = 1.0;
 
   utter.onstart = () => readBtn.classList.add("is-speaking");
@@ -434,17 +502,35 @@ const restartBtn = document.getElementById("restart");
 if (restartBtn) {
   restartBtn.addEventListener("click", () => {
     stopSpeakingIfAny();
-    // Clear everything so the next kid starts fresh
-    if (nameInput) nameInput.value = "";
-    if (describeInput) describeInput.value = "";
+    // Clear everything thoroughly so the next kid starts fresh
+    if (nameInput) {
+      nameInput.value = "";
+      nameInput.setAttribute("value", "");
+    }
+    if (describeInput) {
+      describeInput.value = "";
+      describeInput.setAttribute("value", "");
+    }
     kidName = "";
-    // Also clear any lingering mic status messages
+    // Wipe the "Nice to meet you, Ada" and "You're the best, Ada!" echoes
+    const nameEcho = document.getElementById("name-echo");
+    const nameEcho2 = document.getElementById("name-echo-2");
+    if (nameEcho) nameEcho.textContent = "friend";
+    if (nameEcho2) nameEcho2.textContent = "friend";
+    // Clear any lingering mic status messages
     const nameMicStatus = document.getElementById("name-mic-status");
     const micStatus = document.getElementById("mic-status");
     if (nameMicStatus) nameMicStatus.textContent = "";
     if (micStatus) micStatus.textContent = "";
     showScreen("greet");
-    setTimeout(() => { if (nameInput) nameInput.focus(); }, 400);
+    setTimeout(() => {
+      // Second pass in case autofill repopulated
+      if (nameInput) {
+        nameInput.value = "";
+        nameInput.focus();
+      }
+      if (describeInput) describeInput.value = "";
+    }, 400);
   });
 }
 
